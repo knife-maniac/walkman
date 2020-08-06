@@ -4,7 +4,6 @@ import pygame
 import RPi.GPIO as GPIO
 import time
 
-
 class Button:
     def __init__(self, pin, state):
         self.pin = pin
@@ -19,9 +18,9 @@ buttons = [previous_button, play_button, next_button]
 for button in buttons:
     GPIO.setup(button.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-mp3_files = [ f for f in listdir('songs') if f[-4:] == '.mp3' ]
+mp3_files = listdir('songs')
 
-if not len(mp3_files) > 0:
+if not len(mp3_files):
     print("No mp3 files found!")
 
 print('\n--- Available mp3 files ---\n')
@@ -34,7 +33,7 @@ a_song_is_currently_playing = False
 song_is_paused = False
 
 pygame.init()
-
+music = pygame.mixer.music
 
 def change_song_and_get_new_index(direction, songs, index):
     if direction=='previous':
@@ -53,31 +52,36 @@ def change_song_and_get_new_index(direction, songs, index):
             index = new_index
     
     print("--- " + mp3_files[index] + " ---")        
-    pygame.mixer.music.load('songs/' + mp3_files[index])
+    music.load('songs/' + mp3_files[index])
     return index
 
 
-while True:
-    a_song_is_currently_playing = pygame.mixer.music.get_busy()
+walkman_is_on = True
+
+while walkman_is_on:
+    a_song_is_currently_playing = music.get_busy()
+    
     for button in buttons:
         button.state = not GPIO.input(button.pin)    
-        
+
+
     if previous_button.state:
         index = change_song_and_get_new_index('previous', mp3_files, index)
 
     if play_button.state:
-        if song_is_paused:
-            pygame.mixer.music.unpause()
-            song_is_paused = False
         if not a_song_is_currently_playing:
-            pygame.mixer.music.load('songs/' + mp3_files[index])
-            pygame.mixer.music.play()
+            music.load('songs/' + mp3_files[index])
+            music.play()
+        elif song_is_paused:
+            music.unpause()
+            song_is_paused = False
+        
     elif not song_is_paused:
-        pygame.mixer.music.pause()
+        music.pause()
         song_is_paused = True
 
 
     if next_button.state:
-        index = change_song_and_get_new_index('next', mp3_files, index)
+        index = change_song_and_get_new_index('next', mp3_files,index)
 
     time.sleep(0.25)
