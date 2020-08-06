@@ -12,8 +12,9 @@ class Button:
 previous_button = Button(25, False)
 play_button = Button(24, False)
 next_button = Button(23, False)
+stop_button = Button(18, False)
 
-buttons = [previous_button, play_button, next_button]
+buttons = [previous_button, play_button, next_button, stop_button]
 
 for button in buttons:
     GPIO.setup(button.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
@@ -83,5 +84,12 @@ while walkman_is_on:
 
     if next_button.state:
         index = change_song_and_get_new_index('next', mp3_files,index)
+        
+    if stop_button.state:
+        music.stop()
+        walkman_is_on = False
+        
 
     time.sleep(0.25)
+
+print('Have a nice day ! :)')
