@@ -1,5 +1,5 @@
 import board
-from os import listdir
+import os
 import pygame
 import RPi.GPIO as GPIO
 import time
@@ -19,7 +19,7 @@ buttons = [previous_button, play_button, next_button, stop_button]
 for button in buttons:
     GPIO.setup(button.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-mp3_files = listdir('songs')
+mp3_files = os.listdir('songs')
 
 if not len(mp3_files):
     print("No mp3 files found!")
@@ -92,4 +92,4 @@ while walkman_is_on:
 
     time.sleep(0.25)
 
-print('Have a nice day ! :)')
+os.system('sudo shutdown -h now')
